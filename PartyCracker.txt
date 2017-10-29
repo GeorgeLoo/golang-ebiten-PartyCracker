@@ -6,7 +6,7 @@ Party Cracker notes 29.10.2017 George Loo
 a 'party cracker' app with 
 two people 'pulling ' the cracker 
 and then a winner is chosen
-along with the prize number! 
+?along with the prize number! 
 
 rotation graphics
 sound effects

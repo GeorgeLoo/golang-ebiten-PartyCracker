@@ -29,13 +29,13 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	//"github.com/hajimehoshi/ebiten/audio"
 	//"github.com/hajimehoshi/ebiten/audio/wav"
-	//"github.com/hajimehoshi/ebiten/ebitenutil"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 	// "image"
 	"image/color"
-	//"log"
+	"log"
 	//"os"
-	//"math"
-	//"path/filepath"
+	"math"
+	"path/filepath"
 )
 
 const (
@@ -43,18 +43,71 @@ const (
 	screenheight = 480
 	datafolder = "data"
 	sampleRate   = 44100
-	clockwise = 200
-	anticlockwise = 202
-	notRotating = 204
-	kLunarLanderHeight = 50
-	kMoonOrbitalSpeed = 1600
-	kCommandModule = 801
-	kLunarModule = 802
+
 )
+
+type crackerData struct {
+	pointedDir int 
+	x, y float64   
+	cx, cy int // centre x y 
+	w, h int
+	image *ebiten.Image
+	stretched *ebiten.Image
+
+}
 
 var (
 	canChangeFullscreen bool
+	aCracker crackerData
 )
+
+
+
+func initprog() {
+
+	aCracker.init("cracker2.png", 0, 20,100)
+}
+
+func readimg(fn string) *ebiten.Image {
+	var err error
+	var fname string
+	fname = filepath.Join(datafolder, fn)
+	img, _, err := ebitenutil.NewImageFromFile(
+		fname,
+		ebiten.FilterNearest)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return img
+
+}
+
+func (l *crackerData) init(picFilename string,
+						  pointedDir int,
+						  x float64,
+						  y float64  ) {
+
+	l.image = readimg(picFilename)
+	l.pointedDir = pointedDir
+	l.x = x
+	l.y = y
+}					
+
+func (l *crackerData) draw(screen *ebiten.Image) {
+	w, h := l.image.Size()
+	//fmt.Printf("w %d h %d \n",w,h)
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Reset()
+	opts.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	opts.GeoM.Rotate(float64(l.pointedDir % 360) * 2 * math.Pi / 360)
+	//opts.GeoM.Scale( 1.0, 1.0 )
+	opts.GeoM.Scale( 0.5, 0.5 )
+	opts.GeoM.Translate(l.x, l.y)
+
+	screen.DrawImage(l.image, opts)
+
+}
+
 
 
 func update(screen *ebiten.Image) error {
@@ -64,14 +117,16 @@ func update(screen *ebiten.Image) error {
 		
 	}
 
-	screen.Fill(color.NRGBA{255, 255, 0, 0xff})
+	screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
+
+	aCracker.draw(screen)
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		mx, my := ebiten.CursorPosition()
 		if mx < 50 && my < 50 {
 			togglFullscreen()
 		}
-		
+
 		if mx > (screenwidth-50) && my < 50 {
 			togglFullscreen()
 		}
@@ -92,6 +147,8 @@ func togglFullscreen() {
 }
 
 func main() {
+
+	initprog()
 	scale := 1.0
 	// Initialize Ebiten, and loop the update() function
 	if err := ebiten.Run(update, screenwidth, screenheight, scale, "Party Cracker Simulator 0.0 by George Loo"); err != nil {
