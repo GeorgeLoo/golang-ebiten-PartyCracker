@@ -65,7 +65,7 @@ var (
 
 func initprog() {
 
-	aCracker.init("cracker2.png", 0, 20,100)
+	aCracker.init("cracker2.png", 0, 425,300)
 }
 
 func readimg(fn string) *ebiten.Image {
@@ -101,7 +101,7 @@ func (l *crackerData) draw(screen *ebiten.Image) {
 	opts.GeoM.Translate(-float64(w)/2, -float64(h)/2)
 	opts.GeoM.Rotate(float64(l.pointedDir % 360) * 2 * math.Pi / 360)
 	//opts.GeoM.Scale( 1.0, 1.0 )
-	opts.GeoM.Scale( 0.5, 0.5 )
+	opts.GeoM.Scale( 1.0, 1.0 )
 	opts.GeoM.Translate(l.x, l.y)
 
 	screen.DrawImage(l.image, opts)
