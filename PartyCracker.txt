@@ -10,14 +10,15 @@ along with the prize number!
 
 rotation graphics
 sound effects
-full screen
 Tab and reverse backslash keys for both sides
+touch screen for both sides of the cracker
 stretching graphics
 
 
 
 +++++++++++++++++++++++++++++++++++++++++++
 
+full screen
 
 
 
