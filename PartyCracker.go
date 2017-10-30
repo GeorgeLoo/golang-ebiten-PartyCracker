@@ -27,13 +27,13 @@ package main
 import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten"
-	//"github.com/hajimehoshi/ebiten/audio"
-	//"github.com/hajimehoshi/ebiten/audio/wav"
+	"github.com/hajimehoshi/ebiten/audio"
+	"github.com/hajimehoshi/ebiten/audio/wav"
 	"github.com/hajimehoshi/ebiten/ebitenutil"
 	// "image"
 	"image/color"
 	"log"
-	//"os"
+	"os"
 	"math"
 	"path/filepath"
 )
@@ -56,9 +56,22 @@ type crackerData struct {
 
 }
 
+type soundData struct {
+	mute bool
+	//audioContext    *audio.Context
+	audioPlayer     *audio.Player
+	soundArr       []audio.Player
+
+}
+
+
 var (
 	canChangeFullscreen bool
 	aCracker crackerData
+	sound soundData
+	sound0 int
+	audioContext    *audio.Context
+
 )
 
 
@@ -66,7 +79,73 @@ var (
 func initprog() {
 
 	aCracker.init("cracker2.png", 0, 425,300)
+	sound.init()
+	sound0 = sound.load("sound0.wav")
 }
+
+/*
+only need one audio context, or so I think...
+*/
+func (s *soundData) init() {
+	const sampleRate  = 44100
+	var err error
+	s.mute = false
+	audioContext, err = audio.NewContext(sampleRate)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func (s *soundData) load(fn string) int {
+	var err error
+	
+	//var audioPlayer     *audio.Player
+	
+	f, err := os.Open(filepath.Join(datafolder, fn))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	d, err := wav.Decode(audioContext, f)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s.audioPlayer, err = audio.NewPlayer(audioContext, d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.soundArr = append(s.soundArr, *s.audioPlayer)
+	i := len(s.soundArr) - 1
+	return i // index to the sound
+
+}
+
+
+func (s *soundData) play(idx int) error {
+	//var err error
+
+	if s.mute {
+		return nil
+	}
+	ap := s.soundArr[idx]
+	if !ap.IsPlaying() {
+		//fmt.Print("sound or not?\n")
+		ap.Rewind()
+		err := ap.Play()
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	if err := audioContext.Update(); err != nil {
+		fmt.Print(" !!!!!!!!!!!! SOUND ERROR \n")
+		return err
+	}
+	return nil 
+}
+
 
 func readimg(fn string) *ebiten.Image {
 	var err error
@@ -130,6 +209,10 @@ func update(screen *ebiten.Image) error {
 		if mx > (screenwidth-50) && my < 50 {
 			togglFullscreen()
 		}
+	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyU) {
+		sound.play(sound0)
 	}
 
 	return nil
