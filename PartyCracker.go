@@ -71,7 +71,7 @@ var (
 	sound soundData
 	sound0 int
 	audioContext    *audio.Context
-
+	soundloop *audio.Player
 )
 
 
@@ -81,6 +81,30 @@ func initprog() {
 	aCracker.init("cracker2.png", 0, 425,300)
 	sound.init()
 	sound0 = sound.load("sound0.wav")
+	//ebiten.SetFullscreen(true)
+	soundloop = loadloop("sound1.wav")
+	soundloop.Play()
+}
+
+func loadloop(fn string) *audio.Player {
+
+	wavF, err := ebitenutil.OpenFile(filepath.Join(datafolder, fn))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	wavS, err := wav.Decode(audioContext, wavF)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s := audio.NewInfiniteLoop(wavS, wavS.Size())
+
+	player, err := audio.NewPlayer(audioContext, s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return player
 }
 
 /*

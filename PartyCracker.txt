@@ -18,6 +18,8 @@ stretching graphics
 
 +++++++++++++++++++++++++++++++++++++++++++
 
+
+looping sound
 full screen
 
 
