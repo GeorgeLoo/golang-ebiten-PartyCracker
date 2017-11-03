@@ -53,7 +53,8 @@ type crackerData struct {
 	w, h int
 	image *ebiten.Image
 	stretched *ebiten.Image
-
+	leftSideclick, rightSideClick bool
+	
 }
 
 type soundData struct {
@@ -82,8 +83,8 @@ func initprog() {
 	sound.init()
 	sound0 = sound.load("sound0.wav")
 	//ebiten.SetFullscreen(true)
-	soundloop = loadloop("sound1.wav")
-	soundloop.Play()
+	//soundloop = loadloop("sound1.wav")
+	//soundloop.Play()
 }
 
 func loadloop(fn string) *audio.Player {
@@ -185,6 +186,16 @@ func readimg(fn string) *ebiten.Image {
 
 }
 
+func (l *crackerData) CheckForCrackerPull() {
+
+	if l.leftSideclick && l.rightSideClick {
+		l.leftSideclick = false
+		l.rightSideClick = false
+		//sound.play(sound0)
+		fmt.Print("***********BOOMZ \n")
+	}
+}
+
 func (l *crackerData) init(picFilename string,
 						  pointedDir int,
 						  x float64,
@@ -194,6 +205,9 @@ func (l *crackerData) init(picFilename string,
 	l.pointedDir = pointedDir
 	l.x = x
 	l.y = y
+	l.leftSideclick = false
+	l.rightSideClick = false
+
 }					
 
 func (l *crackerData) draw(screen *ebiten.Image) {
@@ -211,6 +225,20 @@ func (l *crackerData) draw(screen *ebiten.Image) {
 
 }
 
+func approx(n,l,h int) bool {
+
+	// if math.Abs(float64(n)-float64(m)) < 10 {
+	// 	return true
+	// }
+	if n > l && n < h {
+		return true
+	}
+
+	// if n > 355 && m == 0 {
+	// 	return true //handle 0 case 
+	// }
+	return false 
+}
 
 
 func update(screen *ebiten.Image) error {
@@ -230,14 +258,33 @@ func update(screen *ebiten.Image) error {
 			togglFullscreen()
 		}
 
-		if mx > (screenwidth-50) && my < 50 {
+		if mx > (screenwidth-50) && my < 50 {  // top right hand corner
 			togglFullscreen()
 		}
+
+		h := 100
+
+		if approx(my,screenheight/2-h,screenheight/2+h) &&
+			approx(mx,0,screenwidth/4) {
+				//sound.play(sound0)
+				aCracker.leftSideclick = true
+				fmt.Print("***********leftSideclick \n")
+			}
+
+		if approx(my,screenheight/2-h,screenheight/2+h) &&
+			approx(mx,screenwidth-screenwidth/4,screenwidth) {
+				//sound.play(sound0)
+				aCracker.rightSideClick = true
+				fmt.Print("***********rightSideClick \n")
+			}
+
 	}
 
 	if ebiten.IsKeyPressed(ebiten.KeyU) {
 		sound.play(sound0)
 	}
+
+	aCracker.CheckForCrackerPull()
 
 	return nil
 }

@@ -1,3 +1,5 @@
 
 *.lnk
 *.bat
+*.sublime-project
+*.sublime-workspace
