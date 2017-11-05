@@ -53,7 +53,10 @@ type crackerData struct {
 	w, h int
 	image *ebiten.Image
 	stretched *ebiten.Image
+	explode1, explode2 *ebiten.Image
 	leftSideclick, rightSideClick bool
+	timerStart bool
+	timercount int 
 	
 }
 
@@ -186,13 +189,43 @@ func readimg(fn string) *ebiten.Image {
 
 }
 
-func (l *crackerData) CheckForCrackerPull() {
+func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
+	if !l.timerStart {
+		return
+	}
+	l.timercount++
+	if l.timercount == 6 {
+		sound.play(sound0)
 
-	if l.leftSideclick && l.rightSideClick {
+	}
+	if l.timercount == 100 {
+		l.draw(screen,l.explode1)
+		sound.play(sound0)
+	}
+
+	if l.timercount == 160 {
+		l.draw(screen,l.explode2)
+		sound.play(sound0)
+	}
+
+	if l.timercount > 300 {
+		fmt.Print("timer stopped\n")
+		l.timerStart = false
 		l.leftSideclick = false
 		l.rightSideClick = false
+	}
+
+}
+
+func (l *crackerData) CheckForCrackerPull() {
+
+	if !l.timerStart && l.leftSideclick && l.rightSideClick {
+		//l.leftSideclick = false
+		//l.rightSideClick = false
 		//sound.play(sound0)
 		fmt.Print("***********BOOMZ \n")
+		l.timercount = 0
+		l.timerStart = true
 	}
 }
 
@@ -207,11 +240,14 @@ func (l *crackerData) init(picFilename string,
 	l.y = y
 	l.leftSideclick = false
 	l.rightSideClick = false
+	l.timerStart = false
+	l.explode1 = readimg("cracker3.png")
+	l.explode2 = readimg("cracker4.png")
 
 }					
 
-func (l *crackerData) draw(screen *ebiten.Image) {
-	w, h := l.image.Size()
+func (l *crackerData) draw(screen *ebiten.Image, image *ebiten.Image) {
+	w, h := image.Size()
 	//fmt.Printf("w %d h %d \n",w,h)
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Reset()
@@ -221,7 +257,7 @@ func (l *crackerData) draw(screen *ebiten.Image) {
 	opts.GeoM.Scale( 1.0, 1.0 )
 	opts.GeoM.Translate(l.x, l.y)
 
-	screen.DrawImage(l.image, opts)
+	screen.DrawImage(image, opts)
 
 }
 
@@ -250,7 +286,9 @@ func update(screen *ebiten.Image) error {
 
 	screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
 
-	aCracker.draw(screen)
+	aCracker.draw(screen,aCracker.image)
+	aCracker.CrackerTimer(screen)
+
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		mx, my := ebiten.CursorPosition()
