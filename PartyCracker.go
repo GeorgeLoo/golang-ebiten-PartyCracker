@@ -228,7 +228,7 @@ func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 	}
 
 	if l.timercount == 16 {
-		sound.play(sound1)
+		//sound.play(sound0)
 	}
 
 	if l.timercount > 16 {
@@ -244,7 +244,6 @@ func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 		randnum = rand.Intn(100)+1
 		if randnum > 50 {
 			fmt.Print("RIGHT SIDE \n")
-			l.draw(screen,l.rightarrow)
 			l.side = krightside
 		} else {
 			fmt.Print("LEFT SIDE \n")
