@@ -8,9 +8,9 @@ two people 'pulling ' the cracker
 and then a winner is chosen
 ?along with the prize number! 
 
+winner graphics
 rotation graphics
-sound effects
-Tab and reverse backslash keys for both sides
+?Tab and reverse backslash keys for both sides
 touch screen for both sides of the cracker
 stretching graphics
 
@@ -19,6 +19,7 @@ stretching graphics
 +++++++++++++++++++++++++++++++++++++++++++
 
 
+sound effects
 looping sound
 full screen
 

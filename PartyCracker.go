@@ -53,7 +53,7 @@ type crackerData struct {
 	w, h int
 	image *ebiten.Image
 	stretched *ebiten.Image
-	explode1, explode2 *ebiten.Image
+	explode1, explode2, explode3 *ebiten.Image
 	leftSideclick, rightSideClick bool
 	timerStart bool
 	timercount int 
@@ -73,7 +73,7 @@ var (
 	canChangeFullscreen bool
 	aCracker crackerData
 	sound soundData
-	sound0 int
+	sound0, sound1 int
 	audioContext    *audio.Context
 	soundloop *audio.Player
 )
@@ -85,6 +85,7 @@ func initprog() {
 	aCracker.init("cracker2.png", 0, 425,300)
 	sound.init()
 	sound0 = sound.load("sound0.wav")
+	sound1 = sound.load("sound1.wav")
 	//ebiten.SetFullscreen(true)
 	//soundloop = loadloop("sound1.wav")
 	//soundloop.Play()
@@ -190,23 +191,41 @@ func readimg(fn string) *ebiten.Image {
 }
 
 func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
+	
+
+	screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
+	l.draw(screen, l.image)
+
 	if !l.timerStart {
 		return
 	}
 	l.timercount++
 	if l.timercount == 6 {
-		sound.play(sound0)
+		//l.draw(screen,l.explode1)
+		//sound.play(sound0)
 
 	}
-	if l.timercount == 100 {
+	if l.timercount == 1 {
 		l.draw(screen,l.explode1)
 		sound.play(sound0)
 	}
 
-	if l.timercount == 160 {
-		l.draw(screen,l.explode2)
-		sound.play(sound0)
+	if l.timercount > 1 {
+		l.draw(screen,l.explode1)
 	}
+
+	if l.timercount == 16 {
+		sound.play(sound1)
+	}
+
+	if l.timercount > 16 {
+		l.draw(screen,l.explode2)
+	}
+
+	if l.timercount > 32 {
+		l.draw(screen,l.explode3)
+	}
+
 
 	if l.timercount > 300 {
 		fmt.Print("timer stopped\n")
@@ -238,11 +257,12 @@ func (l *crackerData) init(picFilename string,
 	l.pointedDir = pointedDir
 	l.x = x
 	l.y = y
-	l.leftSideclick = false
+	l.leftSideclick = false 
 	l.rightSideClick = false
 	l.timerStart = false
 	l.explode1 = readimg("cracker3.png")
 	l.explode2 = readimg("cracker4.png")
+	l.explode3 = readimg("cracker5.png")
 
 }					
 
@@ -284,9 +304,9 @@ func update(screen *ebiten.Image) error {
 		
 	}
 
-	screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
+	//screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
 
-	aCracker.draw(screen,aCracker.image)
+	//aCracker.draw(screen,aCracker.image)
 	aCracker.CrackerTimer(screen)
 
 
