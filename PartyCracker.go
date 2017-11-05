@@ -36,6 +36,9 @@ import (
 	"os"
 	"math"
 	"path/filepath"
+    "math/rand"
+    "time"
+
 )
 
 const (
@@ -43,7 +46,10 @@ const (
 	screenheight = 480
 	datafolder = "data"
 	sampleRate   = 44100
-
+	kCrackerX = 425
+	kCrackerY = 300
+	kleftside = 700
+	krightside = 711
 )
 
 type crackerData struct {
@@ -57,7 +63,8 @@ type crackerData struct {
 	leftSideclick, rightSideClick bool
 	timerStart bool
 	timercount int 
-	
+	leftarrow, rightarrow *ebiten.Image
+	side int  // which side the arrow will point
 }
 
 type soundData struct {
@@ -76,19 +83,25 @@ var (
 	sound0, sound1 int
 	audioContext    *audio.Context
 	soundloop *audio.Player
+	randnum int
+
 )
 
 
 
 func initprog() {
 
-	aCracker.init("cracker2.png", 0, 425,300)
+	aCracker.init("cracker2.png", 0, kCrackerX,kCrackerY)
 	sound.init()
 	sound0 = sound.load("sound0.wav")
 	sound1 = sound.load("sound1.wav")
 	//ebiten.SetFullscreen(true)
-	//soundloop = loadloop("sound1.wav")
-	//soundloop.Play()
+	soundloop = loadloop("sound1.wav")
+	soundloop.Play()
+	soundloop.Pause()
+
+	rand.Seed( time.Now().UnixNano())
+
 }
 
 func loadloop(fn string) *audio.Player {
@@ -226,12 +239,36 @@ func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 		l.draw(screen,l.explode3)
 	}
 
+	if l.timercount == 60 {
+
+		randnum = rand.Intn(100)+1
+		if randnum > 50 {
+			fmt.Print("RIGHT SIDE \n")
+			l.draw(screen,l.rightarrow)
+			l.side = krightside
+		} else {
+			fmt.Print("LEFT SIDE \n")
+			l.side = kleftside
+		}
+
+	}
+
+	if l.timercount > 120 {
+		if l.side == kleftside {
+			l.draw(screen,l.leftarrow)
+		} else {
+			l.draw(screen,l.rightarrow)
+		}
+	}
+
 
 	if l.timercount > 300 {
 		fmt.Print("timer stopped\n")
+
 		l.timerStart = false
 		l.leftSideclick = false
 		l.rightSideClick = false
+
 	}
 
 }
@@ -263,6 +300,9 @@ func (l *crackerData) init(picFilename string,
 	l.explode1 = readimg("cracker3.png")
 	l.explode2 = readimg("cracker4.png")
 	l.explode3 = readimg("cracker5.png")
+
+	l.leftarrow = readimg("leftarrow.png")
+	l.rightarrow = readimg("rightarrow.png")
 
 }					
 

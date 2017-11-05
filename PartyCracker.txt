@@ -10,15 +10,15 @@ and then a winner is chosen
 
 winner graphics
 rotation graphics
-?Tab and reverse backslash keys for both sides
-touch screen for both sides of the cracker
-stretching graphics
 
 
 
 +++++++++++++++++++++++++++++++++++++++++++
 
 
+?Tab and reverse backslash keys for both sides
+touch screen for both sides of the cracker
+?stretching graphics
 sound effects
 looping sound
 full screen
