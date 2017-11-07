@@ -8,7 +8,6 @@ two people 'pulling ' the cracker
 and then a winner is chosen
 ?along with the prize number! 
 
-rotation graphics
 
 no sound bug
 
@@ -16,6 +15,10 @@ no sound bug
 +++++++++++++++++++++++++++++++++++++++++++
 
 
+
+0.7
+rotation graphics 
+version number
 winner graphics
 ?Tab and reverse backslash keys for both sides
 touch screen for both sides of the cracker

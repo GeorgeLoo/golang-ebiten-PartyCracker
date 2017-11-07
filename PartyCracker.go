@@ -43,6 +43,7 @@ import (
 
 const (
 	version = "0.7"
+	kFullscreen = true //false
 	screenwidth = 800
 	screenheight = 480
 	datafolder = "data"
@@ -66,6 +67,9 @@ type crackerData struct {
 	timercount int 
 	leftarrow, rightarrow *ebiten.Image
 	side int  // which side the arrow will point
+	spintimer bool
+	spintimercount int
+
 }
 
 type soundData struct {
@@ -96,12 +100,17 @@ func initprog() {
 	sound.init()
 	sound0 = sound.load("sound0.wav")
 	sound1 = sound.load("sound1.wav")
-	//ebiten.SetFullscreen(true)
+
+	if kFullscreen {
+		ebiten.SetFullscreen(true)
+	}
+	
 	soundloop = loadloop("sound1.wav")
 	//soundloop.Play()
 	//soundloop.Pause()
 
 	rand.Seed( time.Now().UnixNano())
+
 
 }
 
@@ -213,10 +222,32 @@ func readimg(fn string) *ebiten.Image {
 
 }
 
+
+func (l *crackerData) SpinTimerRoutines(screen *ebiten.Image) {
+	if !l.spintimer {
+		return
+	}
+
+	l.spintimercount--
+	if l.spintimercount < 0 {
+		l.spintimer = false
+		l.pointedDir = 0
+		return
+	}
+
+	l.pointedDir += 6
+	if l.pointedDir > 359 {
+		l.pointedDir = 0
+	}
+
+}
+
 func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 	
 
-	screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
+	//screen.Fill(color.NRGBA{255, 255, 0, 0xff})  // yellow
+	screen.Fill(color.NRGBA{255, 255, 255, 0xff})  // white
+
 	l.draw(screen, l.image)
 
 	if !l.timerStart {
@@ -314,6 +345,10 @@ func (l *crackerData) init(picFilename string,
 	l.leftarrow = readimg("leftarrow.png")
 	l.rightarrow = readimg("rightarrow.png")
 
+	l.spintimer = true
+	l.spintimercount = 370
+
+
 }					
 
 func (l *crackerData) draw(screen *ebiten.Image, image *ebiten.Image) {
@@ -358,7 +393,7 @@ func update(screen *ebiten.Image) error {
 
 	//aCracker.draw(screen,aCracker.image)
 	aCracker.CrackerTimer(screen)
-
+	aCracker.SpinTimerRoutines(screen)
 
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		mx, my := ebiten.CursorPosition()
@@ -413,7 +448,7 @@ func main() {
 	initprog()
 	scale := 1.0
 	// Initialize Ebiten, and loop the update() function
-	if err := ebiten.Run(update, screenwidth, screenheight, scale, "Party Cracker Simulator by George Loo"); err != nil {
+	if err := ebiten.Run(update, screenwidth, screenheight, scale, "Party Cracker Simulator "+version+" by George Loo"); err != nil {
 		panic(err)
 	}
 	fmt.Printf("Party Cracker Program ended -----------------\n")
