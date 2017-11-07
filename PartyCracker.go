@@ -42,6 +42,7 @@ import (
 )
 
 const (
+	version = "0.7"
 	screenwidth = 800
 	screenheight = 480
 	datafolder = "data"
@@ -90,18 +91,27 @@ var (
 
 
 func initprog() {
-
+	loopsoundinit()
 	aCracker.init("cracker2.png", 0, kCrackerX,kCrackerY)
 	sound.init()
 	sound0 = sound.load("sound0.wav")
 	sound1 = sound.load("sound1.wav")
 	//ebiten.SetFullscreen(true)
 	soundloop = loadloop("sound1.wav")
-	soundloop.Play()
-	soundloop.Pause()
+	//soundloop.Play()
+	//soundloop.Pause()
 
 	rand.Seed( time.Now().UnixNano())
 
+}
+
+func loopsoundinit() {
+	var err error
+	fmt.Print("hello loopsoundinit\n")
+	audioContext, err = audio.NewContext(sampleRate)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func loadloop(fn string) *audio.Player {
@@ -130,12 +140,12 @@ only need one audio context, or so I think...
 */
 func (s *soundData) init() {
 	const sampleRate  = 44100
-	var err error
+	//var err error
 	s.mute = false
-	audioContext, err = audio.NewContext(sampleRate)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// audioContext, err = audio.NewContext(sampleRate)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 }
 
@@ -220,7 +230,7 @@ func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 	}
 	if l.timercount == 1 {
 		l.draw(screen,l.explode1)
-		sound.play(sound0)
+		//sound.play(sound0)
 	}
 
 	if l.timercount > 1 {
@@ -249,7 +259,7 @@ func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 			fmt.Print("LEFT SIDE \n")
 			l.side = kleftside
 		}
-
+		soundloop.Pause()
 	}
 
 	if l.timercount > 120 {
@@ -263,7 +273,7 @@ func (l *crackerData) CrackerTimer(screen *ebiten.Image) {
 
 	if l.timercount > 300 {
 		fmt.Print("timer stopped\n")
-
+		
 		l.timerStart = false
 		l.leftSideclick = false
 		l.rightSideClick = false
@@ -278,6 +288,7 @@ func (l *crackerData) CheckForCrackerPull() {
 		//l.leftSideclick = false
 		//l.rightSideClick = false
 		//sound.play(sound0)
+		soundloop.Play()
 		fmt.Print("***********BOOMZ \n")
 		l.timercount = 0
 		l.timerStart = true
@@ -398,11 +409,11 @@ func togglFullscreen() {
 }
 
 func main() {
-
+	fmt.Print("version ", version, "\n")
 	initprog()
 	scale := 1.0
 	// Initialize Ebiten, and loop the update() function
-	if err := ebiten.Run(update, screenwidth, screenheight, scale, "Party Cracker Simulator 0.0 by George Loo"); err != nil {
+	if err := ebiten.Run(update, screenwidth, screenheight, scale, "Party Cracker Simulator by George Loo"); err != nil {
 		panic(err)
 	}
 	fmt.Printf("Party Cracker Program ended -----------------\n")
