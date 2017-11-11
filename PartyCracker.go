@@ -224,14 +224,15 @@ func readimg(fn string) *ebiten.Image {
 
 
 func (l *crackerData) SpinTimerRoutines(screen *ebiten.Image) {
-	if !l.spintimer {
+	if l.spintimercount == 0 {
 		return
 	}
 
 	l.spintimercount--
 	if l.spintimercount < 0 {
-		l.spintimer = false
+		//l.spintimer = false
 		l.pointedDir = 0
+		l.spintimercount = 0
 		return
 	}
 
@@ -346,7 +347,7 @@ func (l *crackerData) init(picFilename string,
 	l.rightarrow = readimg("rightarrow.png")
 
 	l.spintimer = true
-	l.spintimercount = 370
+	l.spintimercount = 360
 
 
 }					
